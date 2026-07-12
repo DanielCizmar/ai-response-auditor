@@ -39,6 +39,7 @@ dist/
 pip-wheel-metadata/
 
 # Python test, lint, and type-check caches
+.cache/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/

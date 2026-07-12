@@ -1,0 +1,16 @@
+{
+  "name": "evidence-grounded-writing-auditor",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Local-first monorepo for the Evidence-Grounded Writing Auditor.",
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "check": "corepack pnpm run test",
+    "test": "corepack pnpm run test:web && uv run pytest",
+    "test:web": "corepack pnpm --filter @auditor/web test",
+    "test:python": "uv run pytest"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "@auditor/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Generated API client boundary; generation is configured in a later milestone."
+}

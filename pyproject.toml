@@ -1,0 +1,23 @@
+[project]
+name = "evidence-grounded-writing-auditor"
+version = "0.0.0"
+description = "Local-first Evidence-Grounded Writing Auditor backend workspace."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<9",
+]
+
+[tool.pytest.ini_options]
+addopts = "--strict-config --strict-markers"
+pythonpath = ["."]
+testpaths = ["backend/tests"]
+
+[tool.uv]
+package = false
+required-version = ">=0.8,<1"
+cache-dir = ".cache/uv"
