@@ -1,0 +1,134 @@
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.local
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Node.js, Next.js, and frontend tooling
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python environments, bytecode, and packaging
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+.python-version.local
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Python test, lint, and type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# JavaScript test and browser-test artifacts
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.nyc_output/
+
+# Celery and worker runtime state
+celerybeat-schedule
+celerybeat.pid
+*.pid
+
+# Local application runtime data
+/tmp/
+/temp/
+/var/
+/runtime/
+/uploads/
+/reports/
+/storage/
+/backups/
+*.dump
+*.backup
+*.sqlite
+*.sqlite3
+
+# Local Docker volume bind mounts
+/.data/
+/pgdata/
+/postgres-data/
+/redis-data/
+/ollama-data/
+
+# Local model weights and caches
+/models/
+/model-cache/
+*.gguf
+*.safetensors
+*.onnx
+*.pt
+*.pth
+
+# Logs and diagnostics
+*.log
+logs/
+*.trace
+*.prof
+
+# Editors and IDEs
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Operating-system metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+._*
+
+# Temporary archives and generated audit exports
+*.tmp
+*.temp
+*.part
+*.crdownload
+/exports/
+
+# Keep dependency locks, migrations, evaluation datasets, fixtures, and
+# generated API clients under version control. Do not add them here.
