@@ -15,6 +15,33 @@ Next.js, FastAPI, PostgreSQL with pgvector, Redis, Celery, Ollama, and Docker Co
 
 The project is currently in the planning and foundation stage. See [docs/PLAN.md](docs/PLAN.md) for the implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
 
+## Development
+
+Prerequisites:
+
+- Node.js 24+ with Corepack
+- pnpm 10.15.1
+- Python 3.12+
+- uv 0.8+
+
+Install the locked workspaces:
+
+```powershell
+corepack enable
+pnpm install --frozen-lockfile
+uv sync --frozen
+```
+
+If Corepack cannot install global shims on a restricted machine, use `corepack pnpm` in place of `pnpm`.
+
+Run the foundation smoke tests:
+
+```powershell
+pnpm test
+```
+
+Application services are intentionally not scaffolded yet. Their setup is delivered by later foundation milestones.
+
 ## Privacy
 
 There are no user accounts or hosted AI dependencies. Uploaded source files are processed temporarily and are not retained after extraction.

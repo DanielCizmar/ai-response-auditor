@@ -39,7 +39,23 @@ Never commit drafts, source documents, extracted private content, model prompts/
 
 ## Local validation
 
-The executable project has not been scaffolded yet. Each later foundation milestone must add its commands here when the relevant tooling exists. The planned required checks are:
+Install the locked JavaScript and Python workspaces:
+
+```powershell
+corepack enable
+pnpm install --frozen-lockfile
+uv sync --frozen
+```
+
+On a restricted machine where Corepack cannot create global shims, use `corepack pnpm` in place of `pnpm`.
+
+Run the currently available smoke tests:
+
+```powershell
+pnpm test
+```
+
+Later foundation milestones must add their commands here when the relevant tooling exists. The planned required checks are:
 
 - Python formatting, linting, typing, and pytest.
 - TypeScript linting, type checking, unit tests, and production build.
@@ -60,12 +76,12 @@ List checks not run and explain why in the pull request.
 
 ## Dependency updates
 
-Dependabot initially monitors GitHub Actions only. Add ecosystems only after their manifests exist:
+Dependabot monitors the root pnpm/Python manifests and GitHub Actions. Add Docker monitoring only after maintained Dockerfiles exist:
 
-| Ecosystem | Enable after | Expected directory |
+| Ecosystem | Status or enablement point | Expected directory |
 |---|---|---|
-| pnpm/npm | Root `package.json` and lockfile exist | `/` |
-| pip/uv | Root `pyproject.toml` and lockfile exist | `/` |
+| pnpm/npm | Enabled | `/` |
+| pip/uv | Enabled | `/` |
 | Docker | A maintained root or service Dockerfile exists | Its containing directory |
 
 Dependency pull requests must pass the same required checks as other changes. Do not merge major model/runtime upgrades without reviewing compatibility and evaluation effects.

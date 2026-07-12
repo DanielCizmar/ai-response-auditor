@@ -1,0 +1,9 @@
+{
+  "name": "@auditor/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Next.js application boundary; framework scaffolding is milestone F6.",
+  "scripts": {
+    "test": "node --test test/smoke.test.mjs"
+  }
+}
