@@ -1,0 +1,64 @@
+name: Feature request
+description: Propose a focused improvement consistent with the approved plan.
+title: "[Feature]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Review `docs/PLAN.md` before proposing work. Requests outside the approved MVP scope require an explicit plan decision before implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user or engineering problem should be solved?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable success without prescribing unnecessary implementation details.
+    validations:
+      required: true
+  - type: dropdown
+    id: release
+    attributes:
+      label: Planned release
+      options:
+        - Foundation
+        - MVP1
+        - MVP2
+        - Post-MVP or plan change
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Related milestone
+      description: Enter the PLAN.md milestone if known.
+      placeholder: M1.13 — Claim highlighting
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List concrete, testable completion conditions.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Architecture, privacy, or model considerations
+      description: Note local-only operation, Ollama, private content, provenance, accessibility, or bilingual effects.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I reviewed AGENTS.md and docs/PLAN.md.
+          required: true
+        - label: This request does not silently introduce authentication, paid services, hosted AI, or permanent source-file storage.
+          required: true

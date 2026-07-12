@@ -1,0 +1,8 @@
+# The repository owner reviews policy, workflow, and source changes.
+* @DanielCizmar
+
+# Require explicit owner review for repository policy and architecture decisions.
+/.github/ @DanielCizmar
+/docs/adr/ @DanielCizmar
+/AGENTS.md @DanielCizmar
+/docs/PLAN.md @DanielCizmar
