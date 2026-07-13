@@ -13,7 +13,6 @@ if str(ROOT) not in sys.path:
 
 from apps.api.main import create_app  # noqa: E402
 
-
 TARGET = ROOT / "packages" / "api-client" / "openapi.json"
 
 

@@ -12,17 +12,23 @@
     "api:dev": "uv run uvicorn apps.api.main:app --reload",
     "check": "corepack pnpm run test",
     "dev:web": "corepack pnpm --filter @auditor/web dev",
+    "format:python:check": "uv run ruff format --check apps backend scripts",
     "infra:down": "docker compose down",
     "infra:up": "docker compose up --detach --wait postgres redis",
     "ollama:check": "python scripts/check_ollama.py",
     "ollama:setup": "python scripts/setup_ollama.py",
     "ollama:up": "docker compose up --detach --wait ollama",
+    "lint:python": "uv run ruff check apps backend scripts",
+    "lint:web": "corepack pnpm --filter @auditor/web lint",
     "openapi:check": "uv run python scripts/generate_openapi.py --check",
     "openapi:generate": "uv run python scripts/generate_openapi.py",
+    "secret:scan": "uv run python scripts/scan_secrets.py",
     "test": "corepack pnpm run test:web && uv run pytest",
     "test:infra": "python scripts/smoke_infra.py",
     "test:ollama": "python scripts/smoke_ollama.py",
     "test:web": "corepack pnpm --filter @auditor/web test",
-    "test:python": "uv run pytest"
+    "test:python": "uv run pytest",
+    "typecheck:python": "uv run mypy apps backend scripts",
+    "typecheck:web": "corepack pnpm --filter @auditor/web typecheck"
   }
 }

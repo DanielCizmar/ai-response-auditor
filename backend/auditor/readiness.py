@@ -46,7 +46,9 @@ def database_probe(settings: Settings) -> DependencyStatus:
                     "SELECT extversion FROM pg_extension WHERE extname = 'vector'"
                 )
                 if cursor.fetchone() is None:
-                    return DependencyStatus(state="vector_extension_missing", ready=False)
+                    return DependencyStatus(
+                        state="vector_extension_missing", ready=False
+                    )
     except (psycopg.Error, OSError):
         return DependencyStatus(state="unavailable", ready=False)
     return DependencyStatus(state="ready", ready=True)
@@ -83,9 +85,14 @@ def ollama_probe(settings: Settings) -> DependencyStatus:
 
 
 def build_readiness_service(settings: Settings) -> ReadinessService:
-    bind: Callable[[Callable[[Settings], DependencyStatus]], ReadinessProbe] = (
-        lambda probe: lambda: probe(settings)
-    )
+    def bind(
+        probe: Callable[[Settings], DependencyStatus],
+    ) -> ReadinessProbe:
+        def bound_probe() -> DependencyStatus:
+            return probe(settings)
+
+        return bound_probe
+
     return ReadinessService(
         {
             "database": bind(database_probe),

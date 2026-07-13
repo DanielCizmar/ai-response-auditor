@@ -7,10 +7,10 @@ from backend.auditor.ollama_runtime import (
     OllamaConfig,
     OllamaState,
     canonical_model_name,
+    fetch_json,
     probe_ollama,
     run_generation_smoke,
 )
-
 
 CONFIG = OllamaConfig(
     base_url="http://localhost:11434",
@@ -83,6 +83,11 @@ def test_readiness_reports_active_model_loading() -> None:
 def test_canonical_model_name_preserves_explicit_tag() -> None:
     assert canonical_model_name("model:4b") == "model:4b"
     assert canonical_model_name("model") == "model:latest"
+
+
+def test_fetch_json_rejects_non_http_schemes() -> None:
+    with pytest.raises(ValueError, match=r"HTTP\(S\)"):
+        fetch_json("file:///private/draft.txt", None, 1)
 
 
 def test_generation_smoke_requires_expected_structured_result() -> None:

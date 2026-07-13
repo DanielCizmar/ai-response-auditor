@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
+from starlette.responses import Response
 
 from apps.api.errors import ErrorEnvelope, install_error_handlers
 from backend.auditor import __version__
@@ -54,7 +56,7 @@ def create_app(
     service = readiness_service or build_readiness_service(settings)
 
     @asynccontextmanager
-    async def lifespan(_app: FastAPI):
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         logger.info("API started", extra={"environment": settings.app_environment})
         yield
         logger.info("API stopped")
@@ -79,7 +81,10 @@ def create_app(
     install_error_handlers(app)
 
     @app.middleware("http")
-    async def request_metadata(request: Request, call_next):
+    async def request_metadata(
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
         request.state.request_id = _request_id(request.headers.get("X-Request-ID"))
         started = time.perf_counter()
         response = await call_next(request)
