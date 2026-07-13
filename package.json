@@ -8,12 +8,15 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "api:dev": "uv run uvicorn apps.api.main:app --reload",
     "check": "corepack pnpm run test",
     "infra:down": "docker compose down",
     "infra:up": "docker compose up --detach --wait postgres redis",
     "ollama:check": "python scripts/check_ollama.py",
     "ollama:setup": "python scripts/setup_ollama.py",
     "ollama:up": "docker compose up --detach --wait ollama",
+    "openapi:check": "uv run python scripts/generate_openapi.py --check",
+    "openapi:generate": "uv run python scripts/generate_openapi.py",
     "test": "corepack pnpm run test:web && uv run pytest",
     "test:infra": "python scripts/smoke_infra.py",
     "test:ollama": "python scripts/smoke_ollama.py",

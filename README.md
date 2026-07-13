@@ -41,7 +41,21 @@ Run the foundation smoke tests:
 pnpm test
 ```
 
-Application services are intentionally not scaffolded yet. Their setup is delivered by later foundation milestones.
+The API foundation is available; the frontend and worker runtimes are introduced by
+their later milestones.
+
+### FastAPI
+
+Start PostgreSQL, Redis, and Ollama, then run the local API:
+
+```powershell
+docker compose up --detach --wait postgres redis ollama
+corepack pnpm api:dev
+```
+
+Process liveness is available at `GET /v1/health`; `GET /v1/readiness` distinguishes
+database, Redis, configured-model, model-loading, and Ollama availability states.
+API documentation is available at `/docs`.
 
 ### Local data infrastructure
 
