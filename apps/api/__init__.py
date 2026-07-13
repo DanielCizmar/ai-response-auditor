@@ -1,6 +1,3 @@
-"""FastAPI entrypoint boundary.
-
-The FastAPI application is introduced in foundation milestone F5.
-"""
+"""FastAPI entrypoint boundary."""
 
 RUNTIME_NAME = "api"
