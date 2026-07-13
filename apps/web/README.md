@@ -1,3 +1,9 @@
 # Web application
 
-This workspace is reserved for the Next.js application. Framework scaffolding belongs to milestone F6; F2 establishes only the workspace boundary and smoke test.
+The Next.js application is an editorial evidence workbench. Start it from the
+repository root with `corepack pnpm dev:web` and create a production build with
+`corepack pnpm build:web`.
+
+Set `NEXT_PUBLIC_API_BASE_URL` to the local FastAPI origin when it differs from
+`http://127.0.0.1:8000`. When the API cannot be reached, the shell remains usable
+and presents a concrete local setup action instead of implying that audits work.

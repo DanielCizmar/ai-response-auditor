@@ -41,6 +41,20 @@ Run the foundation smoke tests:
 pnpm test
 ```
 
+The Next.js frontend foundation is available; product audit flows and the API/worker
+entrypoints are delivered by their respective milestones.
+
+### Frontend
+
+Start the responsive editorial workbench:
+
+```powershell
+corepack pnpm dev:web
+```
+
+The shell checks `http://127.0.0.1:8000` by default. Set
+`NEXT_PUBLIC_API_BASE_URL` when the local FastAPI origin differs. A disconnected
+API produces a concrete setup and retry state rather than a simulated audit.
 The API foundation is available; the frontend and worker runtimes are introduced by
 their later milestones.
 

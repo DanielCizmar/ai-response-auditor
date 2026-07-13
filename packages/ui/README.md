@@ -1,3 +1,5 @@
 # Shared UI
 
-This workspace will contain shared components and design tokens. It intentionally contains no production UI in F2.
+This workspace contains the approved ink, mineral, cool-paper, and semantic status
+tokens plus shadcn-compatible primitives shared by frontend surfaces. Components
+are source exports compiled by their consuming application.
