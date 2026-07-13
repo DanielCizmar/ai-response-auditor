@@ -55,6 +55,13 @@ Run the currently available smoke tests:
 pnpm test
 ```
 
+For changes to local data infrastructure, also run:
+
+```powershell
+corepack pnpm infra:up
+corepack pnpm test:infra
+```
+
 Later foundation milestones must add their commands here when the relevant tooling exists. The planned required checks are:
 
 - Python formatting, linting, typing, and pytest.
