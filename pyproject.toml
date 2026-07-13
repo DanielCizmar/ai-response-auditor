@@ -5,10 +5,17 @@ description = "Local-first Evidence-Grounded Writing Auditor backend workspace."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
-dependencies = []
+dependencies = [
+  "fastapi>=0.116,<1",
+  "psycopg[binary]>=3.2,<4",
+  "pydantic-settings>=2.10,<3",
+  "redis>=6.2,<8",
+  "uvicorn[standard]>=0.35,<1",
+]
 
 [dependency-groups]
 dev = [
+  "httpx>=0.28,<1",
   "pytest>=8.4,<10",
 ]
 
