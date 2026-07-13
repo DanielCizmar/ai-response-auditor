@@ -1,0 +1,32 @@
+:root {
+  --ink: #17232b;
+  --mineral: #2e6073;
+  --canvas: #eef2f3;
+  --paper: #fafbf9;
+  --supported: #237a6b;
+  --warning: #a56b1f;
+  --high-risk: #b6413b;
+  --evidence-needed: #68777d;
+  --line: #ced7d9;
+  --faint-line: #e1e7e8;
+  --focus: #2e6073;
+  --font-prose: "Source Serif 4 Variable", Georgia, serif;
+  --font-interface: "Source Sans 3 Variable", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-mineral: var(--mineral);
+  --color-canvas: var(--canvas);
+  --color-paper: var(--paper);
+  --color-supported: var(--supported);
+  --color-warning: var(--warning);
+  --color-high-risk: var(--high-risk);
+  --color-evidence-needed: var(--evidence-needed);
+  --color-line: var(--line);
+  --color-faint-line: var(--faint-line);
+  --font-prose: var(--font-prose);
+  --font-interface: var(--font-interface);
+  --font-mono: var(--font-mono);
+}

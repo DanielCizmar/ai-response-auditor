@@ -8,7 +8,9 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "build:web": "corepack pnpm --filter @auditor/web build",
     "check": "corepack pnpm run test",
+    "dev:web": "corepack pnpm --filter @auditor/web dev",
     "infra:down": "docker compose down",
     "infra:up": "docker compose up --detach --wait postgres redis",
     "ollama:check": "python scripts/check_ollama.py",
