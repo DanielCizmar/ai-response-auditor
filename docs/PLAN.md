@@ -1006,14 +1006,6 @@ Each milestone should fit into one focused pull request unless explicitly marked
 - **Completion:** required checks pass from clean checkout.
 - **Dependencies:** F3, F5, F6.
 
-#### F8 — Vercel portfolio deployment
-
-- **Goal:** deploy the frontend on Vercel Hobby.
-- **Deliverables:** GitHub integration, preview deployment, static fixture demo, disconnected API state.
-- **Tests:** Vercel build and Playwright fixture smoke test.
-- **Completion:** `main` deploys without requiring a paid backend.
-- **Dependencies:** F6–F7.
-
 ### MVP1
 
 #### M1.1 — Bilingual UI foundation

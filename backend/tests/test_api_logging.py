@@ -1,7 +1,7 @@
 import json
 import logging
 
-from backend.auditor.logging import JsonFormatter, REDACTED, redact
+from backend.auditor.logging import REDACTED, JsonFormatter, redact
 
 
 def test_redaction_removes_private_fields_and_url_passwords() -> None:

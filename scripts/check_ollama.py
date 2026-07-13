@@ -5,12 +5,15 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.auditor.ollama_runtime import OllamaState, load_config, probe_ollama  # noqa: E402
+from backend.auditor.ollama_runtime import (  # noqa: E402
+    OllamaState,
+    load_config,
+    probe_ollama,
+)
 
 
 def main() -> int:

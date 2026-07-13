@@ -8,15 +8,12 @@ import re
 from datetime import UTC, datetime
 from typing import Any
 
-
 REDACTED = "[REDACTED]"
 SENSITIVE_KEY = re.compile(
     r"(authorization|cookie|password|secret|token|api[_-]?key|draft|prompt|passage|text|model_response)",
     re.IGNORECASE,
 )
-URL_CREDENTIALS = re.compile(
-    r"(\b[a-z][a-z0-9+.-]*://[^/@\s]*:)([^@\s]+)(@)", re.I
-)
+URL_CREDENTIALS = re.compile(r"(\b[a-z][a-z0-9+.-]*://[^/@\s]*:)([^@\s]+)(@)", re.I)
 BEARER_TOKEN = re.compile(r"(\bBearer\s+)[^\s]+", re.I)
 
 
@@ -57,7 +54,9 @@ class JsonFormatter(logging.Formatter):
             if key not in self._standard_attributes and not key.startswith("_"):
                 payload[key] = redact(value, key=key)
         if record.exc_info:
-            payload["exception_type"] = record.exc_info[0].__name__
+            exception_type = record.exc_info[0]
+            if exception_type is not None:
+                payload["exception_type"] = exception_type.__name__
         return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 

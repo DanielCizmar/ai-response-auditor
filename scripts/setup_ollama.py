@@ -7,7 +7,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -18,7 +17,9 @@ from backend.auditor.ollama_runtime import load_config, probe_ollama  # noqa: E4
 def run(*command: str) -> None:
     result = subprocess.run(command, cwd=ROOT, check=False)
     if result.returncode != 0:
-        raise RuntimeError(f"Command failed with exit code {result.returncode}: {' '.join(command)}")
+        raise RuntimeError(
+            f"Command failed with exit code {result.returncode}: {' '.join(command)}"
+        )
 
 
 def parse_args() -> argparse.Namespace:
@@ -39,9 +40,7 @@ def main() -> int:
     try:
         if not args.skip_start:
             run("docker", "compose", "up", "--detach", "--wait", "ollama")
-        for model in dict.fromkeys(
-            (config.instruction_model, config.embedding_model)
-        ):
+        for model in dict.fromkeys((config.instruction_model, config.embedding_model)):
             print(f"Pulling local Ollama model: {model}", flush=True)
             run("docker", "compose", "exec", "-T", "ollama", "ollama", "pull", model)
     except (OSError, RuntimeError) as error:

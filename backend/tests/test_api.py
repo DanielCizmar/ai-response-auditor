@@ -46,10 +46,30 @@ def test_readiness_reports_each_required_dependency_and_optional_worker() -> Non
     assert response.json() == {
         "status": "ready",
         "dependencies": {
-            "database": {"state": "ready", "ready": True, "required": True, "action": None},
-            "redis": {"state": "ready", "ready": True, "required": True, "action": None},
-            "ollama": {"state": "ready", "ready": True, "required": True, "action": None},
-            "worker": {"state": "not_configured", "ready": False, "required": False, "action": None},
+            "database": {
+                "state": "ready",
+                "ready": True,
+                "required": True,
+                "action": None,
+            },
+            "redis": {
+                "state": "ready",
+                "ready": True,
+                "required": True,
+                "action": None,
+            },
+            "ollama": {
+                "state": "ready",
+                "ready": True,
+                "required": True,
+                "action": None,
+            },
+            "worker": {
+                "state": "not_configured",
+                "ready": False,
+                "required": False,
+                "action": None,
+            },
         },
     }
 
@@ -160,6 +180,8 @@ def test_openapi_documents_system_contracts_without_private_test_route() -> None
 
 
 def test_invalid_request_id_is_replaced_with_uuid() -> None:
-    response = client().get("/v1/health", headers={"X-Request-ID": "private free-form value"})
+    response = client().get(
+        "/v1/health", headers={"X-Request-ID": "private free-form value"}
+    )
 
     assert UUID(response.headers["X-Request-ID"])

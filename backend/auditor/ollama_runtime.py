@@ -10,8 +10,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
-
 
 JsonObject = dict[str, Any]
 JsonFetcher = Callable[[str, JsonObject | None, float], JsonObject]
@@ -68,9 +68,7 @@ def load_config(
     values.update(environment if environment is not None else os.environ)
     return OllamaConfig(
         base_url=values.get("OLLAMA_BASE_URL", "http://127.0.0.1:11435").rstrip("/"),
-        instruction_model=values.get(
-            "OLLAMA_INSTRUCTION_MODEL", "qwen3:4b-instruct"
-        ),
+        instruction_model=values.get("OLLAMA_INSTRUCTION_MODEL", "qwen3:4b-instruct"),
         embedding_model=values.get("OLLAMA_EMBEDDING_MODEL", "embeddinggemma"),
         timeout_seconds=float(values.get("OLLAMA_REQUEST_TIMEOUT_SECONDS", "180")),
     )
@@ -81,8 +79,10 @@ def fetch_json(
     payload: JsonObject | None,
     timeout_seconds: float,
 ) -> JsonObject:
+    if urlsplit(url).scheme not in {"http", "https"}:
+        raise ValueError("Ollama requests require an HTTP(S) URL.")
     data = None if payload is None else json.dumps(payload).encode("utf-8")
-    request = Request(
+    request = Request(  # noqa: S310 - URL scheme is allowlisted above.
         url,
         data=data,
         headers={"Content-Type": "application/json"},
@@ -121,7 +121,14 @@ def probe_ollama(
                 }
             )
         )
-    except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError) as error:
+    except (
+        HTTPError,
+        URLError,
+        TimeoutError,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as error:
         return OllamaReadiness(
             state=OllamaState.UNAVAILABLE,
             instruction_model=config.instruction_model,

@@ -6,7 +6,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -37,8 +36,7 @@ def check_postgres() -> None:
         "postgres",
         "sh",
         "-ec",
-        f'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" '
-        f'-d "$POSTGRES_DB" -tAc "{query}"',
+        f'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "{query}"',
     )
     fields = output.split(":")
     if len(fields) != 3 or not all(fields):
@@ -47,8 +45,7 @@ def check_postgres() -> None:
         )
     database, role, vector_version = fields
     print(
-        f"PostgreSQL ready: database={database}, role={role}, "
-        f"vector={vector_version}"
+        f"PostgreSQL ready: database={database}, role={role}, vector={vector_version}"
     )
 
 

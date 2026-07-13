@@ -16,18 +16,21 @@ Configure these settings for `main` after the corresponding CI jobs exist. Do no
 
 ## Enable as CI jobs are added
 
-Require branches to be up to date before merging, then require the stable job names introduced by foundation milestone F7 for:
+Require branches to be up to date before merging, then require these exact stable
+workflow/job checks introduced by foundation milestone F7:
 
-- Python formatting and linting.
-- Python type checking.
-- Backend tests.
-- Frontend linting and type checking.
-- Frontend unit tests and production build.
-- Alembic migration verification.
-- OpenAPI/generated-client consistency.
-- Secret scanning.
-- Docker Compose smoke testing when available.
-- Playwright smoke testing when available.
+- `CI / Python quality`
+- `CI / Backend tests`
+- `CI / Frontend quality`
+- `CI / Frontend tests and build`
+- `CI / OpenAPI contract`
+- `CI / Migration check`
+- `CI / Infrastructure smoke`
+- `Security / Secret scan`
+
+The migration check is intentionally a configuration gate until M1.2 introduces
+Alembic revisions. Add generated-client and Playwright checks only when their
+milestones create those artifacts; do not require nonexistent checks.
 
 Record final check names here when workflows are implemented; do not guess names in GitHub settings.
 

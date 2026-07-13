@@ -49,10 +49,20 @@ uv sync --frozen
 
 On a restricted machine where Corepack cannot create global shims, use `corepack pnpm` in place of `pnpm`.
 
-Run the currently available smoke tests:
+Run the locked quality, contract, and test checks:
 
 ```powershell
-pnpm test
+corepack pnpm install --frozen-lockfile
+uv sync --frozen --all-groups
+corepack pnpm format:python:check
+corepack pnpm lint:python
+corepack pnpm typecheck:python
+corepack pnpm lint:web
+corepack pnpm typecheck:web
+corepack pnpm test
+corepack pnpm build:web
+corepack pnpm openapi:check
+corepack pnpm secret:scan
 ```
 
 For changes to local data infrastructure, also run:
@@ -70,15 +80,18 @@ corepack pnpm ollama:setup
 corepack pnpm test:ollama
 ```
 
-Later foundation milestones must add their commands here when the relevant tooling exists. The planned required checks are:
+GitHub Actions runs these required checks on pull requests and pushes to `main`:
 
 - Python formatting, linting, typing, and pytest.
-- TypeScript linting, type checking, unit tests, and production build.
-- Alembic upgrade from an empty database.
-- OpenAPI and generated TypeScript client consistency.
-- Docker Compose smoke tests.
-- Playwright end-to-end tests when product flows exist.
-- Markdown/YAML validation for documentation and GitHub configuration.
+- TypeScript linting, type checking, unit tests, and a production build.
+- OpenAPI contract freshness.
+- PostgreSQL/pgvector and Redis Compose smoke testing.
+- Secret scanning against a hashed baseline.
+- An Alembic configuration gate. Until M1.2, it verifies that no partial migration
+  scaffold exists; after M1.2 it runs `alembic upgrade head` against PostgreSQL.
+
+Playwright and generated TypeScript client checks are added when those artifacts
+exist. Do not label their absence as a passing product check.
 
 Before opening a pull request now, at minimum run:
 
