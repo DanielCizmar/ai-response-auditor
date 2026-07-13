@@ -23,6 +23,7 @@ Prerequisites:
 - pnpm 10.15.1
 - Python 3.12+
 - uv 0.8+
+- Docker with Compose
 
 Install the locked workspaces:
 
@@ -41,6 +42,25 @@ pnpm test
 ```
 
 Application services are intentionally not scaffolded yet. Their setup is delivered by later foundation milestones.
+
+### Local data infrastructure
+
+Start PostgreSQL with pgvector and Redis, wait for both health checks, and run the connection smoke test:
+
+```powershell
+corepack pnpm infra:up
+corepack pnpm test:infra
+```
+
+The services bind only to `127.0.0.1` and persist data in Docker named volumes. Local defaults are defined in `docker-compose.yml`; copy `.env.example` to `.env` only when overrides are needed.
+
+Stop the services without deleting their data:
+
+```powershell
+corepack pnpm infra:down
+```
+
+Deleting the named volumes is intentionally not exposed as a package script because it destroys local data.
 
 ## Privacy
 

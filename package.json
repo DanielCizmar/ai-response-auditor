@@ -9,7 +9,10 @@
   },
   "scripts": {
     "check": "corepack pnpm run test",
+    "infra:down": "docker compose down",
+    "infra:up": "docker compose up --detach --wait postgres redis",
     "test": "corepack pnpm run test:web && uv run pytest",
+    "test:infra": "python scripts/smoke_infra.py",
     "test:web": "corepack pnpm --filter @auditor/web test",
     "test:python": "uv run pytest"
   }
