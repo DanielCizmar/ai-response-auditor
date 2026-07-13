@@ -11,8 +11,12 @@
     "check": "corepack pnpm run test",
     "infra:down": "docker compose down",
     "infra:up": "docker compose up --detach --wait postgres redis",
+    "ollama:check": "python scripts/check_ollama.py",
+    "ollama:setup": "python scripts/setup_ollama.py",
+    "ollama:up": "docker compose up --detach --wait ollama",
     "test": "corepack pnpm run test:web && uv run pytest",
     "test:infra": "python scripts/smoke_infra.py",
+    "test:ollama": "python scripts/smoke_ollama.py",
     "test:web": "corepack pnpm --filter @auditor/web test",
     "test:python": "uv run pytest"
   }

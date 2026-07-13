@@ -992,7 +992,7 @@ Each milestone should fit into one focused pull request unless explicitly marked
 
 #### F6 — Next.js foundation
 
-- **Goal:** establish the frontend and design system.
+- **Goal:** establish the frontend and design system, use available FE skills.
 - **Deliverables:** Next.js, Tailwind, shadcn/ui setup, TanStack Query, tokens, responsive shell.
 - **Tests:** component smoke and production build.
 - **Completion:** shell renders local/disconnected states accessibly.

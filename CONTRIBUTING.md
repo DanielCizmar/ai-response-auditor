@@ -62,6 +62,14 @@ corepack pnpm infra:up
 corepack pnpm test:infra
 ```
 
+For changes to the Ollama runtime or model setup, run the mocked tests and, when local resources permit, the real generation smoke test:
+
+```powershell
+corepack pnpm test:python
+corepack pnpm ollama:setup
+corepack pnpm test:ollama
+```
+
 Later foundation milestones must add their commands here when the relevant tooling exists. The planned required checks are:
 
 - Python formatting, linting, typing, and pytest.

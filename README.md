@@ -62,6 +62,18 @@ corepack pnpm infra:down
 
 Deleting the named volumes is intentionally not exposed as a package script because it destroys local data.
 
+### Local Ollama
+
+Start Ollama and pull the configured instruction and embedding models:
+
+```powershell
+corepack pnpm ollama:setup
+corepack pnpm ollama:check
+corepack pnpm test:ollama
+```
+
+CPU mode is the default. NVIDIA and AMD GPU overrides, hardware notes, readiness states, and model configuration are documented in [docs/development/ollama.md](docs/development/ollama.md).
+
 ## Privacy
 
 There are no user accounts or hosted AI dependencies. Uploaded source files are processed temporarily and are not retained after extraction.
