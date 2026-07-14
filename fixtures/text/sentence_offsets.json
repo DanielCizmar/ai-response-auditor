@@ -1,0 +1,35 @@
+{
+  "version": "sentence-offsets-v1",
+  "offset_convention": "unicode-code-points-v1",
+  "cases": [
+    {
+      "id": "en-abbreviation-number-list",
+      "language": "en",
+      "text": "Dr. Novák measured 3.14 units. Results rose by 12%.\n- No effect was found 😀.",
+      "sentences": [
+        "Dr. Novák measured 3.14 units.",
+        "Results rose by 12%.",
+        "No effect was found 😀."
+      ]
+    },
+    {
+      "id": "sk-abbreviation-list-combining",
+      "language": "sk",
+      "text": "Napr. prvá vzorka mala 10 %. Druhá bola vyššia.\n1. Žiadny účinok sa nezistil é.",
+      "sentences": [
+        "Napr. prvá vzorka mala 10 %.",
+        "Druhá bola vyššia.",
+        "Žiadny účinok sa nezistil é."
+      ]
+    },
+    {
+      "id": "en-quotes-hard-break",
+      "language": "en",
+      "text": "The report said “No change.”\nA second line has no punctuation",
+      "sentences": [
+        "The report said “No change.”",
+        "A second line has no punctuation"
+      ]
+    }
+  ]
+}

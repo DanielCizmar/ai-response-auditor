@@ -2,7 +2,12 @@ import { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { describe, expect, it } from "vitest";
 
-import { countUnicodeCharacters, getCanonicalText } from "@/lib/canonical-text";
+import {
+  codePointOffsetToUtf16Index,
+  countUnicodeCharacters,
+  getCanonicalText,
+  sliceByCodePointOffsets,
+} from "@/lib/canonical-text";
 
 describe("canonical text", () => {
   it("round-trips paragraphs, hard breaks, diacritics, emoji, and combining marks", () => {
@@ -49,5 +54,13 @@ describe("canonical text", () => {
 
   it("counts Unicode code points rather than UTF-16 code units", () => {
     expect(countUnicodeCharacters("A😀e\u0301")).toBe(4);
+  });
+
+  it("maps persisted code-point offsets without splitting emoji", () => {
+    const source = "A😀e\u0301Z";
+
+    expect(sliceByCodePointOffsets(source, 1, 4)).toBe("😀e\u0301");
+    expect(codePointOffsetToUtf16Index(source, 2)).toBe(3);
+    expect(() => sliceByCodePointOffsets(source, 0, 6)).toThrow(RangeError);
   });
 });

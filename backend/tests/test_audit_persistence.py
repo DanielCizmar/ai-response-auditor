@@ -68,6 +68,19 @@ def test_finalized_audit_input_and_results_are_immutable(
             (claim_id, audit_id, source, source, len(source)),
         )
 
+        with pytest.raises(psycopg.errors.RaiseException, match="offsets do not match"):
+            cursor.execute(
+                """
+                INSERT INTO claims (
+                    id, audit_id, ordinal, exact_text, normalized_text,
+                    start_offset, end_offset, primary_type, secondary_types,
+                    status, extraction_confidence, risk_score
+                ) VALUES (%s, %s, 1, 'wrong text', 'wrong text', 0, 10,
+                          'factual', '{}', 'review_recommended', 0.9, 20)
+                """,
+                (uuid7(), audit_id),
+            )
+
         with pytest.raises(psycopg.errors.RaiseException, match="input.*immutable"):
             cursor.execute(
                 "UPDATE audits SET input_text = 'changed' WHERE id = %s", (audit_id,)
@@ -153,4 +166,39 @@ def test_audit_events_are_append_only(
                 (uuid7(), audit_id),
             )
 
+        cursor.execute("DELETE FROM audits WHERE id = %s", (audit_id,))
+
+
+def test_database_claim_offsets_count_unicode_code_points(
+    database_connection: psycopg.Connection[tuple[object, ...]],
+) -> None:
+    audit_id = uuid7()
+    source = "Údaj 😀 vzrástol."
+    exact_text = "😀 vzrástol"
+    start = source.index(exact_text)
+    end = start + len(exact_text)
+
+    with database_connection.cursor() as cursor:
+        cursor.execute(
+            """
+            INSERT INTO audits (
+                id, source_type, language, input_text, input_hash, state,
+                pipeline_version, model_manifest, scoring_version,
+                normalization_version
+            ) VALUES (%s, 'pasted_text', 'sk', %s, %s, 'running',
+                      'pipeline-v1', '{}', 'score-v1', 'unicode-code-points-v1')
+            """,
+            (audit_id, source, hashlib.sha256(source.encode()).hexdigest()),
+        )
+        cursor.execute(
+            """
+            INSERT INTO claims (
+                id, audit_id, ordinal, exact_text, normalized_text,
+                start_offset, end_offset, primary_type, secondary_types,
+                status, extraction_confidence, risk_score
+            ) VALUES (%s, %s, 0, %s, %s, %s, %s, 'factual', '{}',
+                      NULL, 0.9, NULL)
+            """,
+            (uuid7(), audit_id, exact_text, exact_text, start, end),
+        )
         cursor.execute("DELETE FROM audits WHERE id = %s", (audit_id,))
