@@ -1,12 +1,22 @@
 "use client";
 
-import { Button, cn } from "@auditor/ui";
-import { PanelRight, ShieldCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ApiClientError, type Audit } from "@auditor/api-client";
 import type { Locale } from "@auditor/i18n";
+import { Button, cn } from "@auditor/ui";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  CheckCircle2,
+  CircleAlert,
+  LoaderCircle,
+  PanelRight,
+  ShieldCheck,
+} from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 
+import { AuditRequestTimeout, runAudit } from "@/lib/audits";
 import { countUnicodeCharacters } from "@/lib/canonical-text";
 import { useLocale } from "@/lib/locale";
+import { fetchReadiness } from "@/lib/readiness";
 
 import { LocaleSelector } from "./locale-selector";
 import { ServiceReadiness } from "./service-readiness";
@@ -18,6 +28,9 @@ export function WorkspaceShell({ initialText = "" }: Readonly<{ initialText?: st
   const { t, tp } = useLocale();
   const [textLanguage, setTextLanguage] = useState<Locale>("en");
   const [canonicalText, setCanonicalText] = useState(initialText);
+  const idempotencyKey = useRef<string | null>(null);
+  const readiness = useQuery({ queryKey: ["readiness"], queryFn: fetchReadiness });
+  const audit = useMutation({ mutationFn: runAudit });
   const characterCount = useMemo(
     () => countUnicodeCharacters(canonicalText),
     [canonicalText],
@@ -29,6 +42,44 @@ export function WorkspaceShell({ initialText = "" }: Readonly<{ initialText?: st
     : isOverLimit
       ? tp("editor.overLimit", characterCount - MAX_AUDIT_CHARACTERS)
       : t("editor.valid");
+  const servicesReady = readiness.data?.status === "ready";
+  const savedPending = audit.data?.state === "queued" || audit.data?.state === "running";
+  const retryable =
+    audit.isError ||
+    savedPending ||
+    audit.data?.state === "failed" ||
+    audit.data?.state === "partially_succeeded";
+  const canAudit = !isEmpty && !isOverLimit && servicesReady && !audit.isPending;
+
+  function submitAudit() {
+    const reuseKey = audit.error instanceof AuditRequestTimeout || savedPending;
+    if (!reuseKey || !idempotencyKey.current) {
+      idempotencyKey.current = globalThis.crypto.randomUUID();
+    }
+    audit.mutate({
+      text: canonicalText,
+      language: textLanguage,
+      idempotencyKey: idempotencyKey.current,
+    });
+  }
+
+  const auditLabel = audit.isPending
+    ? t("audit.pending.action")
+    : savedPending
+      ? t("audit.check")
+      : retryable
+        ? t("audit.retry")
+        : t("audit.action");
+  const auditStatus =
+    audit.isPending || savedPending
+      ? t("audit.pending.short")
+      : audit.data?.state === "succeeded"
+        ? t("audit.complete.short")
+        : audit.data?.state === "partially_succeeded"
+          ? t("audit.partial.short")
+          : audit.data?.state === "failed" || audit.isError
+            ? t("audit.failed.short")
+            : t("audit.notStarted");
 
   return (
     <div className="min-h-screen px-3 py-3 sm:px-5 sm:py-5 lg:px-8">
@@ -106,23 +157,18 @@ export function WorkspaceShell({ initialText = "" }: Readonly<{ initialText?: st
                 </div>
                 <PanelRight aria-hidden="true" className="size-5 text-evidence-needed" />
               </div>
-              <div className="flex min-h-56 flex-col justify-center py-9 lg:min-h-[27rem]">
-                <p className="text-sm font-semibold text-ink">{t("review.empty.title")}</p>
-                <p className="mt-2 text-sm leading-6 text-evidence-needed">
-                  {t("review.empty.detail")}
-                </p>
-                <div className="mt-6 border-l-2 border-dashed border-evidence-needed/45 pl-4">
-                  <p className="font-mono text-[0.64rem] uppercase tracking-[0.13em] text-evidence-needed">{t("review.thread.inactive")}</p>
-                  <p className="mt-1 text-xs leading-5 text-evidence-needed">{t("review.thread.path")}</p>
-                </div>
-              </div>
+              <AuditState
+                audit={audit.data}
+                error={audit.error}
+                pending={audit.isPending || savedPending}
+              />
             </aside>
           </div>
 
           <footer className="flex flex-col gap-3 border-t border-line bg-paper px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
               <p className="font-mono text-xs text-evidence-needed">
-                {t("editor.count", { count: characterCount, limit: MAX_AUDIT_CHARACTERS })} · {t("audit.notStarted")}
+                {t("editor.count", { count: characterCount, limit: MAX_AUDIT_CHARACTERS })} · {auditStatus}
               </p>
               <p
                 id="editor-validation"
@@ -136,14 +182,104 @@ export function WorkspaceShell({ initialText = "" }: Readonly<{ initialText?: st
               </p>
             </div>
             <div className="flex flex-col items-start gap-1 sm:items-end">
-              <Button disabled>{t("audit.action")}</Button>
+              <Button disabled={!canAudit} onClick={submitAudit}>
+                {audit.isPending && <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />}
+                {auditLabel}
+              </Button>
               <span className="max-w-sm text-left text-xs text-evidence-needed sm:text-right">
-                {t("audit.unavailable")}
+                {!servicesReady
+                  ? t("audit.servicesUnavailable")
+                  : audit.isPending
+                    ? t("audit.pending.detail")
+                    : savedPending
+                      ? t("audit.check.detail")
+                      : retryable
+                        ? t("audit.retry.detail")
+                        : t("audit.available")}
               </span>
             </div>
           </footer>
         </main>
       </div>
+    </div>
+  );
+}
+
+function AuditState({
+  audit,
+  error,
+  pending,
+}: Readonly<{ audit?: Audit; error: Error | null; pending: boolean }>) {
+  const { t } = useLocale();
+  let title = t("review.empty.title");
+  let detail = t("review.empty.detail");
+  let Icon = PanelRight;
+  let tone = "text-evidence-needed";
+
+  if (pending) {
+    title = t("audit.pending.title");
+    detail = t("audit.pending.detail");
+    Icon = LoaderCircle;
+    tone = "text-mineral";
+  } else if (audit?.state === "succeeded") {
+    title = t("audit.complete.title");
+    detail = t("audit.complete.detail", { count: audit.claims.length });
+    Icon = CheckCircle2;
+    tone = "text-supported";
+  } else if (audit?.state === "partially_succeeded") {
+    title = t("audit.partial.title");
+    detail = t("audit.partial.detail", { count: audit.claims.length });
+    Icon = CircleAlert;
+    tone = "text-warning";
+  } else if (audit?.state === "failed") {
+    const timedOut = audit.safe_error_code === "MODEL_TIMEOUT";
+    title = timedOut ? t("audit.timeout.title") : t("audit.failed.title");
+    detail = timedOut ? t("audit.timeout.detail") : t("audit.failed.detail");
+    Icon = CircleAlert;
+    tone = "text-high-risk";
+  } else if (error) {
+    const missingModel = error instanceof ApiClientError && error.code === "MODEL_NOT_READY";
+    const timedOut = error instanceof AuditRequestTimeout;
+    title = missingModel
+      ? t("audit.modelMissing.title")
+      : timedOut
+        ? t("audit.timeout.title")
+        : t("audit.failed.title");
+    detail = missingModel
+      ? t("audit.modelMissing.detail")
+      : timedOut
+        ? t("audit.timeout.detail")
+        : t("audit.failed.detail");
+    Icon = CircleAlert;
+    tone = "text-high-risk";
+  }
+
+  return (
+    <div
+      aria-live={error || audit?.state === "failed" ? "assertive" : "polite"}
+      className="flex min-h-56 flex-col justify-center py-9 lg:min-h-[27rem]"
+    >
+      <Icon
+        aria-hidden="true"
+        className={cn("mb-4 size-5", tone, pending && "animate-spin")}
+      />
+      <p className="text-sm font-semibold text-ink">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-evidence-needed">{detail}</p>
+      {audit && (
+        <p className="mt-5 font-mono text-[0.64rem] uppercase tracking-[0.13em] text-evidence-needed">
+          {t("audit.reference", { id: audit.id.slice(0, 8) })}
+        </p>
+      )}
+      {!audit && !pending && !error && (
+        <div className="mt-6 border-l-2 border-dashed border-evidence-needed/45 pl-4">
+          <p className="font-mono text-[0.64rem] uppercase tracking-[0.13em] text-evidence-needed">
+            {t("review.thread.inactive")}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-evidence-needed">
+            {t("review.thread.path")}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -39,6 +39,8 @@ class ClaimRepository:
                 start_offset=claim.start_offset,
                 end_offset=claim.end_offset,
                 primary_type=claim.primary_type,
+                atomicity=claim.atomicity,
+                verifiability=claim.verifiability,
                 secondary_types=[value.value for value in claim.secondary_types],
                 status=None,
                 extraction_confidence=Decimal(str(claim.confidence)),

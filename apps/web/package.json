@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@auditor/api-client": "workspace:*",
     "@auditor/i18n": "workspace:*",
     "@auditor/ui": "workspace:*",
     "@fontsource-variable/source-sans-3": "^5.2.9",

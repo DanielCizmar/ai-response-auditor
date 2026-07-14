@@ -30,6 +30,10 @@ class Settings(BaseSettings):
     ollama_request_timeout_seconds: float = Field(default=180, gt=0)
     ollama_max_concurrency: int = Field(default=1, ge=1)
     readiness_timeout_seconds: float = Field(default=2, gt=0, le=30)
+    cors_allowed_origins: tuple[str, ...] = (
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+    )
 
     @property
     def psycopg_url(self) -> str:

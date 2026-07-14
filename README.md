@@ -13,10 +13,10 @@ Next.js, FastAPI, PostgreSQL with pgvector, Redis, Celery, Ollama, and Docker Co
 
 ## Status
 
-Foundation and MVP1 milestones M1.1–M1.6 are available: bilingual interface
-catalogs, immutable audit schema, the local pasted-text editor, offset-safe sentence
-splitting, a validated Ollama instruction boundary, and atomic claim extraction.
-Audit API execution begins in later MVP1 milestones. See [docs/PLAN.md](docs/PLAN.md)
+Foundation and MVP1 milestones M1.1–M1.12 are available: the bilingual editor,
+immutable audit persistence, explicit deterministic and model-assisted pipeline stages,
+versioned risk scoring and revisions, a working audit API, and browser execution states.
+Claim highlighting and inspection begin in the next milestones. See [docs/PLAN.md](docs/PLAN.md)
 for the implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
 
 ## Development
@@ -63,8 +63,10 @@ The API foundation is available; the frontend and worker runtimes are introduced
 their later milestones.
 
 The editor accepts English or Slovak text, preserves a canonical plain-text copy,
-and enforces the 10,000 Unicode-character MVP1 limit. The audit action remains
-unavailable until the audit API and pipeline milestones are implemented.
+and enforces the 10,000 Unicode-character MVP1 limit. The audit action becomes
+available when PostgreSQL, Redis, and the configured local Ollama models report
+ready. Pending, timeout, partial, retry, missing-model, and disconnected states are
+explicit in the workbench.
 
 ### FastAPI
 
@@ -78,6 +80,10 @@ corepack pnpm api:dev
 Process liveness is available at `GET /v1/health`; `GET /v1/readiness` distinguishes
 database, Redis, configured-model, model-loading, and Ollama availability states.
 API documentation is available at `/docs`.
+
+Create an immutable audit with `POST /v1/audits` and an `Idempotency-Key` header,
+retrieve it with `GET /v1/audits/{audit_id}`, or create a linked immutable rerun with
+`POST /v1/audits/{audit_id}/re-audit` and a new idempotency key.
 
 ### Local data infrastructure
 

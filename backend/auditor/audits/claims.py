@@ -49,7 +49,8 @@ class SourceMention(BaseModel):
 class AtomicClaimCandidate(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    sentence_id: str = Field(pattern=r"^s\d{4}$")
+    # Ollama's JSON-schema grammar accepts explicit digit classes, not ``\d``.
+    sentence_id: str = Field(pattern=r"^s[0-9]{4}$")
     exact_text: str = Field(min_length=1)
     normalized_text: str = Field(min_length=1)
     start_offset: int = Field(ge=0)
@@ -259,7 +260,9 @@ def _system_prompt(language: AuditLanguage, max_claims: int) -> str:
         "express exactly one proposition and copy an exact, contiguous source span. "
         "Use global zero-based, end-exclusive Unicode code-point offsets. Reference "
         "only supplied sentence IDs. Classify with allowlisted schema values, identify "
-        "quantity and entity spans only when explicit, and return no more than "
+        "quantity and entity spans only when explicit and their exact offsets are "
+        "certain; otherwise return empty arrays for those optional mentions. Never "
+        "return duplicate claims. Return no more than "
         f"{max_claims} claims. Analyze {language_name} text in {language_name}. "
         "Return concise structured fields only; do not provide reasoning."
     )

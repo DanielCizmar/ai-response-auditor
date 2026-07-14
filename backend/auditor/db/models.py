@@ -25,6 +25,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from backend.auditor.audits.claims import Atomicity, Verifiability
 from backend.auditor.db.base import Base
 from backend.auditor.domain.audits import (
     AuditLanguage,
@@ -52,10 +53,15 @@ class Audit(Base):
     __table_args__ = (
         Index("ix_audits_input_hash", "input_hash"),
         Index("ix_audits_state", "state"),
+        UniqueConstraint("idempotency_key", name="uq_audits_idempotency_key"),
     )
 
     id: Mapped[UUID] = mapped_column(
         PGUUID(as_uuid=True), primary_key=True, default=uuid7
+    )
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    re_audit_of_id: Mapped[UUID | None] = mapped_column(
+        PGUUID(as_uuid=True), ForeignKey("audits.id", ondelete="RESTRICT")
     )
     source_type: Mapped[AuditSourceType] = mapped_column(
         enum_type(AuditSourceType, "audit_source_type"), nullable=False
@@ -115,6 +121,12 @@ class Claim(Base):
     end_offset: Mapped[int] = mapped_column(Integer, nullable=False)
     primary_type: Mapped[ClaimType | None] = mapped_column(
         enum_type(ClaimType, "claim_type")
+    )
+    atomicity: Mapped[Atomicity] = mapped_column(
+        enum_type(Atomicity, "claim_atomicity"), nullable=False
+    )
+    verifiability: Mapped[Verifiability] = mapped_column(
+        enum_type(Verifiability, "claim_verifiability"), nullable=False
     )
     secondary_types: Mapped[list[str]] = mapped_column(
         ARRAY(String(32)), nullable=False, default=list

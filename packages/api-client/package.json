@@ -2,5 +2,20 @@
   "name": "@auditor/api-client",
   "version": "0.0.0",
   "private": true,
-  "description": "Generated API client boundary; generation is configured in a later milestone."
+  "description": "Typed client for the generated auditor OpenAPI contract.",
+  "type": "module",
+  "scripts": {
+    "generate": "openapi-typescript openapi.json -o src/schema.ts",
+    "check": "openapi-typescript openapi.json -o src/schema.ts --check"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "openapi.json"
+  ],
+  "devDependencies": {
+    "openapi-typescript": "^7.10.1"
+  }
 }

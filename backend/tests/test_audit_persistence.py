@@ -48,10 +48,10 @@ def test_finalized_audit_input_and_results_are_immutable(
         cursor.execute(
             """
             INSERT INTO audits (
-                id, source_type, language, input_text, input_hash, state,
+                id, idempotency_key, source_type, language, input_text, input_hash, state,
                 pipeline_version, model_manifest, scoring_version,
                 normalization_version
-            ) VALUES (%s, 'pasted_text', 'en', %s, %s, 'running',
+            ) VALUES (%s, 'persistence-immutability', 'pasted_text', 'en', %s, %s, 'running',
                       'pipeline-v1', '{}', 'score-v1', 'canonical-v1')
             """,
             (audit_id, source, input_hash),
@@ -60,9 +60,10 @@ def test_finalized_audit_input_and_results_are_immutable(
             """
             INSERT INTO claims (
                 id, audit_id, ordinal, exact_text, normalized_text,
-                start_offset, end_offset, primary_type, secondary_types,
+                start_offset, end_offset, primary_type, atomicity, verifiability, secondary_types,
                 status, extraction_confidence, risk_score
-            ) VALUES (%s, %s, 0, %s, %s, 0, %s, 'numerical', '{}',
+            ) VALUES (%s, %s, 0, %s, %s, 0, %s, 'numerical', 'atomic',
+                      'externally_verifiable', '{}',
                       'review_recommended', 0.95, 25)
             """,
             (claim_id, audit_id, source, source, len(source)),
@@ -73,10 +74,11 @@ def test_finalized_audit_input_and_results_are_immutable(
                 """
                 INSERT INTO claims (
                     id, audit_id, ordinal, exact_text, normalized_text,
-                    start_offset, end_offset, primary_type, secondary_types,
+                    start_offset, end_offset, primary_type, atomicity, verifiability, secondary_types,
                     status, extraction_confidence, risk_score
                 ) VALUES (%s, %s, 1, 'wrong text', 'wrong text', 0, 10,
-                          'factual', '{}', 'review_recommended', 0.9, 20)
+                          'factual', 'atomic', 'externally_verifiable', '{}',
+                          'review_recommended', 0.9, 20)
                 """,
                 (uuid7(), audit_id),
             )
@@ -107,9 +109,10 @@ def test_finalized_audit_input_and_results_are_immutable(
                 """
                 INSERT INTO claims (
                     id, audit_id, ordinal, exact_text, normalized_text,
-                    start_offset, end_offset, primary_type, secondary_types,
+                    start_offset, end_offset, primary_type, atomicity, verifiability, secondary_types,
                     status, extraction_confidence, risk_score
-                ) VALUES (%s, %s, 1, %s, %s, 0, %s, 'factual', '{}',
+                ) VALUES (%s, %s, 1, %s, %s, 0, %s, 'factual', 'atomic',
+                          'externally_verifiable', '{}',
                           'low_risk', 0.99, 0)
                 """,
                 (uuid7(), audit_id, source, source, len(source)),
@@ -130,10 +133,10 @@ def test_audit_events_are_append_only(
         cursor.execute(
             """
             INSERT INTO audits (
-                id, source_type, language, input_text, input_hash, state,
+                id, idempotency_key, source_type, language, input_text, input_hash, state,
                 pipeline_version, model_manifest, scoring_version,
                 normalization_version
-            ) VALUES (%s, 'pasted_text', 'en', %s, %s, 'running',
+            ) VALUES (%s, 'persistence-events', 'pasted_text', 'en', %s, %s, 'running',
                       'pipeline-v1', '{}', 'score-v1', 'canonical-v1')
             """,
             (audit_id, source, input_hash),
@@ -182,10 +185,10 @@ def test_database_claim_offsets_count_unicode_code_points(
         cursor.execute(
             """
             INSERT INTO audits (
-                id, source_type, language, input_text, input_hash, state,
+                id, idempotency_key, source_type, language, input_text, input_hash, state,
                 pipeline_version, model_manifest, scoring_version,
                 normalization_version
-            ) VALUES (%s, 'pasted_text', 'sk', %s, %s, 'running',
+            ) VALUES (%s, 'persistence-unicode', 'pasted_text', 'sk', %s, %s, 'running',
                       'pipeline-v1', '{}', 'score-v1', 'unicode-code-points-v1')
             """,
             (audit_id, source, hashlib.sha256(source.encode()).hexdigest()),
@@ -194,9 +197,10 @@ def test_database_claim_offsets_count_unicode_code_points(
             """
             INSERT INTO claims (
                 id, audit_id, ordinal, exact_text, normalized_text,
-                start_offset, end_offset, primary_type, secondary_types,
+                start_offset, end_offset, primary_type, atomicity, verifiability, secondary_types,
                 status, extraction_confidence, risk_score
-            ) VALUES (%s, %s, 0, %s, %s, %s, %s, 'factual', '{}',
+            ) VALUES (%s, %s, 0, %s, %s, %s, %s, 'factual', 'atomic',
+                      'externally_verifiable', '{}',
                       NULL, 0.9, NULL)
             """,
             (uuid7(), audit_id, exact_text, exact_text, start, end),
