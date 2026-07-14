@@ -13,10 +13,11 @@ Next.js, FastAPI, PostgreSQL with pgvector, Redis, Celery, Ollama, and Docker Co
 
 ## Status
 
-Foundation and MVP1 milestones M1.1–M1.3 are available: bilingual interface
-catalogs, immutable audit schema, and the local pasted-text editor. Audit pipeline
-execution begins in later MVP1 milestones. See [docs/PLAN.md](docs/PLAN.md) for the
-implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
+Foundation and MVP1 milestones M1.1–M1.6 are available: bilingual interface
+catalogs, immutable audit schema, the local pasted-text editor, offset-safe sentence
+splitting, a validated Ollama instruction boundary, and atomic claim extraction.
+Audit API execution begins in later MVP1 milestones. See [docs/PLAN.md](docs/PLAN.md)
+for the implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
 
 ## Development
 
