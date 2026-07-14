@@ -46,7 +46,7 @@ class SentenceSpan(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    id: str = Field(pattern=r"^s\d{4}$")
+    id: str = Field(pattern=r"^s[0-9]{4}$")
     ordinal: int = Field(ge=0)
     text: str = Field(min_length=1)
     start_offset: int = Field(ge=0)

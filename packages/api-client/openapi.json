@@ -1,6 +1,330 @@
 {
   "components": {
     "schemas": {
+      "Atomicity": {
+        "enum": [
+          "atomic",
+          "compound"
+        ],
+        "title": "Atomicity",
+        "type": "string"
+      },
+      "AuditLanguage": {
+        "enum": [
+          "en",
+          "sk"
+        ],
+        "title": "AuditLanguage",
+        "type": "string"
+      },
+      "AuditResult": {
+        "properties": {
+          "claims": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimResult"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventResult"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "input_text": {
+            "title": "Input Text",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/AuditLanguage"
+          },
+          "model_manifest": {
+            "additionalProperties": true,
+            "title": "Model Manifest",
+            "type": "object"
+          },
+          "normalization_version": {
+            "title": "Normalization Version",
+            "type": "string"
+          },
+          "pipeline_version": {
+            "title": "Pipeline Version",
+            "type": "string"
+          },
+          "re_audit_of_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Re Audit Of Id"
+          },
+          "safe_error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Safe Error Code"
+          },
+          "scoring_version": {
+            "title": "Scoring Version",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/AuditSourceType"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "$ref": "#/components/schemas/AuditState"
+          }
+        },
+        "required": [
+          "id",
+          "re_audit_of_id",
+          "source_type",
+          "language",
+          "input_text",
+          "state",
+          "pipeline_version",
+          "model_manifest",
+          "scoring_version",
+          "normalization_version",
+          "started_at",
+          "completed_at",
+          "safe_error_code",
+          "created_at",
+          "claims",
+          "events"
+        ],
+        "title": "AuditResult",
+        "type": "object"
+      },
+      "AuditSourceType": {
+        "enum": [
+          "pasted_text"
+        ],
+        "title": "AuditSourceType",
+        "type": "string"
+      },
+      "AuditState": {
+        "enum": [
+          "queued",
+          "running",
+          "succeeded",
+          "partially_succeeded",
+          "failed",
+          "cancel_requested",
+          "cancelled"
+        ],
+        "title": "AuditState",
+        "type": "string"
+      },
+      "ClaimResult": {
+        "properties": {
+          "atomicity": {
+            "$ref": "#/components/schemas/Atomicity"
+          },
+          "end_offset": {
+            "title": "End Offset",
+            "type": "integer"
+          },
+          "exact_text": {
+            "title": "Exact Text",
+            "type": "string"
+          },
+          "extraction_confidence": {
+            "title": "Extraction Confidence",
+            "type": "number"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/FindingResult"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "normalized_text": {
+            "title": "Normalized Text",
+            "type": "string"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "primary_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "risk_components": {
+            "items": {
+              "$ref": "#/components/schemas/RiskComponentResult"
+            },
+            "title": "Risk Components",
+            "type": "array"
+          },
+          "risk_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Risk Score"
+          },
+          "secondary_types": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Secondary Types",
+            "type": "array"
+          },
+          "start_offset": {
+            "title": "Start Offset",
+            "type": "integer"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "suggested_revisions": {
+            "items": {
+              "$ref": "#/components/schemas/RevisionResult"
+            },
+            "title": "Suggested Revisions",
+            "type": "array"
+          },
+          "verifiability": {
+            "$ref": "#/components/schemas/Verifiability"
+          }
+        },
+        "required": [
+          "id",
+          "ordinal",
+          "exact_text",
+          "normalized_text",
+          "start_offset",
+          "end_offset",
+          "atomicity",
+          "verifiability",
+          "primary_type",
+          "secondary_types",
+          "status",
+          "extraction_confidence",
+          "risk_score",
+          "findings",
+          "risk_components",
+          "suggested_revisions"
+        ],
+        "title": "ClaimResult",
+        "type": "object"
+      },
+      "ClaimStatus": {
+        "enum": [
+          "low_risk",
+          "review_recommended",
+          "evidence_needed",
+          "internally_inconsistent",
+          "overstated",
+          "not_verifiable"
+        ],
+        "title": "ClaimStatus",
+        "type": "string"
+      },
+      "ClaimType": {
+        "enum": [
+          "factual",
+          "causal",
+          "numerical",
+          "comparative",
+          "definitional",
+          "recommendation",
+          "other"
+        ],
+        "title": "ClaimType",
+        "type": "string"
+      },
+      "CreateAuditRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "language": {
+            "$ref": "#/components/schemas/AuditLanguage"
+          },
+          "text": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "language"
+        ],
+        "title": "CreateAuditRequest",
+        "type": "object"
+      },
       "DependencyResponse": {
         "properties": {
           "action": {
@@ -75,6 +399,122 @@
         "title": "ErrorEnvelope",
         "type": "object"
       },
+      "EventResult": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "redacted_payload": {
+            "additionalProperties": true,
+            "title": "Redacted Payload",
+            "type": "object"
+          },
+          "sequence": {
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "stage": {
+            "title": "Stage",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sequence",
+          "event_type",
+          "stage",
+          "status",
+          "redacted_payload",
+          "created_at"
+        ],
+        "title": "EventResult",
+        "type": "object"
+      },
+      "FindingResult": {
+        "properties": {
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "finding_type": {
+            "title": "Finding Type",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "rule_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rule Version"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/FindingSeverity"
+          },
+          "source_kind": {
+            "$ref": "#/components/schemas/FindingSource"
+          }
+        },
+        "required": [
+          "id",
+          "finding_type",
+          "source_kind",
+          "severity",
+          "details",
+          "rule_version",
+          "prompt_version"
+        ],
+        "title": "FindingResult",
+        "type": "object"
+      },
+      "FindingSeverity": {
+        "enum": [
+          "info",
+          "low",
+          "moderate",
+          "high",
+          "critical"
+        ],
+        "title": "FindingSeverity",
+        "type": "string"
+      },
+      "FindingSource": {
+        "enum": [
+          "deterministic",
+          "model_assisted"
+        ],
+        "title": "FindingSource",
+        "type": "string"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -113,6 +553,106 @@
         ],
         "title": "ReadinessResponse",
         "type": "object"
+      },
+      "RevisionResult": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "$ref": "#/components/schemas/AuditLanguage"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "replacement_text": {
+            "title": "Replacement Text",
+            "type": "string"
+          },
+          "validation_status": {
+            "$ref": "#/components/schemas/RevisionValidationStatus"
+          }
+        },
+        "required": [
+          "id",
+          "replacement_text",
+          "rationale",
+          "language",
+          "model_version",
+          "prompt_version",
+          "validation_status"
+        ],
+        "title": "RevisionResult",
+        "type": "object"
+      },
+      "RevisionValidationStatus": {
+        "enum": [
+          "pending",
+          "valid",
+          "invalid"
+        ],
+        "title": "RevisionValidationStatus",
+        "type": "string"
+      },
+      "RiskComponentResult": {
+        "properties": {
+          "component_type": {
+            "title": "Component Type",
+            "type": "string"
+          },
+          "explanation_message_key": {
+            "title": "Explanation Message Key",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "raw_value": {
+            "additionalProperties": true,
+            "title": "Raw Value",
+            "type": "object"
+          },
+          "scoring_version": {
+            "title": "Scoring Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "component_type",
+          "raw_value",
+          "points",
+          "explanation_message_key",
+          "scoring_version"
+        ],
+        "title": "RiskComponentResult",
+        "type": "object"
+      },
+      "Verifiability": {
+        "enum": [
+          "externally_verifiable",
+          "internally_verifiable",
+          "not_verifiable"
+        ],
+        "title": "Verifiability",
+        "type": "string"
       }
     }
   },
@@ -123,6 +663,217 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/v1/audits": {
+      "post": {
+        "operationId": "create_audit_v1_audits_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 8,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAuditRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Resource not found"
+          },
+          "409": {
+            "description": "Idempotency key conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unexpected server error"
+          },
+          "503": {
+            "description": "A required local service or model is not ready"
+          }
+        },
+        "summary": "Create Audit",
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/v1/audits/{audit_id}": {
+      "get": {
+        "operationId": "get_audit_v1_audits__audit_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audit_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Audit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Audit not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unexpected server error"
+          }
+        },
+        "summary": "Get Audit",
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/v1/audits/{audit_id}/re-audit": {
+      "post": {
+        "operationId": "re_audit_v1_audits__audit_id__re_audit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audit_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Audit Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 8,
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Source audit not found"
+          },
+          "409": {
+            "description": "Idempotency key conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request validation failed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unexpected server error"
+          },
+          "503": {
+            "description": "A required local service or model is not ready"
+          }
+        },
+        "summary": "Re Audit",
+        "tags": [
+          "audits"
+        ]
+      }
+    },
     "/v1/health": {
       "get": {
         "operationId": "health_v1_health_get",

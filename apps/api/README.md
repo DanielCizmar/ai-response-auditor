@@ -24,4 +24,21 @@ introduced in milestone M2.4. Readiness is unavailable (`503`) when any currentl
 required dependency is unavailable or a configured Ollama model is absent/loading.
 
 The provider-independent instruction model and atomic claim extractor are shared
-backend application services. They are not exposed as audit routes until M1.11.
+backend application services. M1.11 composes them behind:
+
+- `POST /v1/audits` with a required `Idempotency-Key` header.
+- `GET /v1/audits/{audit_id}`.
+- `POST /v1/audits/{audit_id}/re-audit` with a new idempotency key.
+
+Each pipeline stage commits independently and appends a redacted event. A model
+failure after usable deterministic work produces `partially_succeeded`; an essential
+extraction failure produces `failed`, never a low-risk result.
+
+After the local stack and configured model are ready, run the opt-in real pipeline
+smoke with:
+
+```powershell
+$env:RUN_REAL_OLLAMA = "1"
+uv run pytest backend/tests/test_real_audit_smoke.py -q
+Remove-Item Env:RUN_REAL_OLLAMA
+```

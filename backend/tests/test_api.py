@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi import FastAPI
@@ -9,8 +10,68 @@ from fastapi.testclient import TestClient
 
 from apps.api.errors import ApiError
 from apps.api.main import create_app
+from backend.auditor.audits.service import (
+    AUDIT_PIPELINE_VERSION,
+    AuditNotFoundError,
+    AuditResult,
+    IdempotencyConflictError,
+)
 from backend.auditor.config import Settings
 from backend.auditor.readiness import DependencyStatus, ReadinessService
+
+
+class FakeAuditService:
+    def __init__(self) -> None:
+        self.by_id: dict[UUID, AuditResult] = {}
+        self.by_key: dict[str, AuditResult] = {}
+
+    def create(
+        self,
+        text: str,
+        language: Any,
+        idempotency_key: str,
+        *,
+        re_audit_of_id: UUID | None = None,
+    ) -> tuple[AuditResult, bool]:
+        existing = self.by_key.get(idempotency_key)
+        if existing is not None:
+            if (
+                existing.input_text != text
+                or existing.language != language.value
+                or existing.re_audit_of_id != re_audit_of_id
+            ):
+                raise IdempotencyConflictError
+            return existing, True
+        now = datetime.now(UTC)
+        result = AuditResult.model_validate(
+            {
+                "id": uuid4(),
+                "re_audit_of_id": re_audit_of_id,
+                "source_type": "pasted_text",
+                "language": language.value,
+                "input_text": text,
+                "state": "succeeded",
+                "pipeline_version": AUDIT_PIPELINE_VERSION,
+                "model_manifest": {"instruction_model": "fake-instruction-v1"},
+                "scoring_version": "mvp1-risk-v1",
+                "normalization_version": "unicode-code-points-v1",
+                "started_at": now,
+                "completed_at": now,
+                "safe_error_code": None,
+                "created_at": now,
+                "claims": [],
+                "events": [],
+            }
+        )
+        self.by_id[result.id] = result
+        self.by_key[idempotency_key] = result
+        return result, False
+
+    def get(self, audit_id: UUID) -> AuditResult:
+        try:
+            return self.by_id[audit_id]
+        except KeyError as error:
+            raise AuditNotFoundError from error
 
 
 def service(**overrides: DependencyStatus) -> ReadinessService:
@@ -185,3 +246,105 @@ def test_invalid_request_id_is_replaced_with_uuid() -> None:
     )
 
     assert UUID(response.headers["X-Request-ID"])
+
+
+def test_create_get_and_reaudit_preserve_idempotency_and_lineage() -> None:
+    audits = FakeAuditService()
+    api = TestClient(
+        create_app(
+            Settings(_env_file=None, app_log_level="CRITICAL"),
+            service(),
+            audits,
+        )
+    )
+    headers = {"Idempotency-Key": "request-0001"}
+
+    created = api.post(
+        "/v1/audits",
+        headers=headers,
+        json={"text": "A bounded claim.", "language": "en"},
+    )
+    assert created.status_code == 201
+    audit_id = created.json()["id"]
+
+    replay = api.post(
+        "/v1/audits",
+        headers=headers,
+        json={"text": "A bounded claim.", "language": "en"},
+    )
+    assert replay.status_code == 200
+    assert replay.headers["Idempotent-Replay"] == "true"
+    assert replay.json()["id"] == audit_id
+
+    fetched = api.get(f"/v1/audits/{audit_id}")
+    assert fetched.status_code == 200
+    assert fetched.json()["input_text"] == "A bounded claim."
+
+    rerun = api.post(
+        f"/v1/audits/{audit_id}/re-audit",
+        headers={"Idempotency-Key": "request-0002"},
+    )
+    assert rerun.status_code == 201
+    assert rerun.json()["id"] != audit_id
+    assert rerun.json()["re_audit_of_id"] == audit_id
+
+
+def test_create_audit_rejects_reused_key_for_different_content() -> None:
+    audits = FakeAuditService()
+    api = TestClient(create_app(Settings(_env_file=None), service(), audits))
+    headers = {"Idempotency-Key": "request-0001"}
+    api.post(
+        "/v1/audits",
+        headers=headers,
+        json={"text": "First claim.", "language": "en"},
+    )
+
+    response = api.post(
+        "/v1/audits",
+        headers=headers,
+        json={"text": "Different claim.", "language": "en"},
+    )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "IDEMPOTENCY_CONFLICT"
+
+
+def test_create_audit_exposes_missing_model_without_sending_text_to_pipeline() -> None:
+    audits = FakeAuditService()
+    api = TestClient(
+        create_app(
+            Settings(_env_file=None),
+            service(
+                ollama=DependencyStatus(
+                    "instruction_model_missing",
+                    False,
+                    action="corepack pnpm ollama:setup",
+                )
+            ),
+            audits,
+        )
+    )
+
+    response = api.post(
+        "/v1/audits",
+        headers={"Idempotency-Key": "request-0001"},
+        json={"text": "A private claim.", "language": "en"},
+    )
+
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "MODEL_NOT_READY"
+    assert audits.by_id == {}
+
+
+def test_create_audit_rejects_whitespace_and_oversized_text() -> None:
+    api = TestClient(
+        create_app(Settings(_env_file=None), service(), FakeAuditService())
+    )
+    for text in ("   ", "x" * 10_001):
+        response = api.post(
+            "/v1/audits",
+            headers={"Idempotency-Key": "request-0001"},
+            json={"text": text, "language": "en"},
+        )
+        assert response.status_code == 422
+        assert response.json()["error"]["code"] == "VALIDATION_ERROR"

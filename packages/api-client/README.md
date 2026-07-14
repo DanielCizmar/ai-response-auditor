@@ -2,6 +2,6 @@
 
 `openapi.json` is the generated source contract for this package. Regenerate it with
 `corepack pnpm openapi:generate` whenever FastAPI routes or schemas change.
-TypeScript client generation is introduced alongside the first product API contracts.
-
-This workspace is reserved for the generated TypeScript API client. No generated placeholder is committed in F2.
+`src/schema.ts` is generated from that contract with `openapi-typescript`; do not edit
+it by hand. The fetch boundary in `src/index.ts` uses those generated types and is used
+by the browser integration. Run `corepack pnpm openapi:generate` after API changes.

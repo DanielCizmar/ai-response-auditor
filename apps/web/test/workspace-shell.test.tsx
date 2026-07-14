@@ -19,6 +19,53 @@ function renderShell(initialText = "") {
   );
 }
 
+function auditResponse(
+  state: "succeeded" | "partially_succeeded" | "failed",
+  safeErrorCode: string | null = null,
+) {
+  const now = "2026-07-14T12:00:00Z";
+  return {
+    id: "01980abc-0000-7000-8000-000000000001",
+    re_audit_of_id: null,
+    source_type: "pasted_text",
+    language: "en",
+    input_text: "A careful claim.",
+    state,
+    pipeline_version: "mvp1-audit-pipeline-v1",
+    model_manifest: {},
+    scoring_version: "mvp1-risk-v1",
+    normalization_version: "unicode-code-points-v1",
+    started_at: now,
+    completed_at: now,
+    safe_error_code: safeErrorCode,
+    created_at: now,
+    claims: state === "failed" ? [] : [{ id: "claim-1" }],
+    events: [],
+  };
+}
+
+function connectedFetch(audit: ReturnType<typeof auditResponse> | Promise<never>) {
+  return vi.fn((input: string | URL | Request, _init?: RequestInit) => {
+    void _init;
+    if (String(input).endsWith("/v1/readiness")) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          status: "ready",
+          dependencies: { ollama: { state: "ready", ready: true, required: true } },
+        }),
+      });
+    }
+    if (audit instanceof Promise) return audit;
+    return Promise.resolve({
+      ok: true,
+      status: 201,
+      json: async () => audit,
+    });
+  });
+}
+
 beforeEach(() => {
   window.localStorage.clear();
 });
@@ -102,5 +149,93 @@ describe("WorkspaceShell", () => {
     renderShell();
 
     expect(await screen.findByText("Local services ready")).toBeInTheDocument();
+  });
+
+  it("submits a bounded audit and reports a completed local result", async () => {
+    const fetchMock = connectedFetch(auditResponse("succeeded"));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    renderShell("A careful claim.");
+
+    await screen.findByText("Local services ready");
+    await user.click(screen.getByRole("button", { name: "Audit text" }));
+
+    expect(await screen.findByText("Audit complete", { selector: "p" })).toBeInTheDocument();
+    expect(screen.getByText(/immutable audit contains 1 claims/i)).toBeInTheDocument();
+    const request = fetchMock.mock.calls.find(([input]) =>
+      String(input).endsWith("/v1/audits"),
+    );
+    expect(request?.[1]).toMatchObject({ method: "POST" });
+    expect((request?.[1] as RequestInit).headers).toMatchObject({
+      "Idempotency-Key": expect.any(String),
+    });
+  });
+
+  it("keeps the action pending while the local model is working", async () => {
+    vi.stubGlobal("fetch", connectedFetch(new Promise(() => undefined)));
+    const user = userEvent.setup();
+    renderShell("A careful claim.");
+
+    await screen.findByText("Local services ready");
+    await user.click(screen.getByRole("button", { name: "Audit text" }));
+
+    expect(screen.getByRole("button", { name: "Auditing text" })).toBeDisabled();
+    expect(screen.getByText("Reviewing the text locally")).toBeInTheDocument();
+  });
+
+  it("preserves usable partial results and offers a retry", async () => {
+    vi.stubGlobal(
+      "fetch",
+      connectedFetch(auditResponse("partially_succeeded", "PARTIAL_MODEL_TIMEOUT")),
+    );
+    const user = userEvent.setup();
+    renderShell("A careful claim.");
+
+    await screen.findByText("Local services ready");
+    await user.click(screen.getByRole("button", { name: "Audit text" }));
+
+    expect(await screen.findByText("Usable results with a partial failure")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry audit" })).toBeEnabled();
+  });
+
+  it("shows a concrete setup state when the instruction model is missing", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 503,
+        json: async () => ({
+          status: "not_ready",
+          dependencies: {
+            ollama: {
+              state: "instruction_model_missing",
+              ready: false,
+              required: true,
+              action: "corepack pnpm ollama:setup",
+            },
+          },
+        }),
+      }),
+    );
+    renderShell("A careful claim.");
+
+    expect(await screen.findByText("Local model is missing")).toBeInTheDocument();
+    expect(screen.getByText("corepack pnpm ollama:setup")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Audit text" })).toBeDisabled();
+  });
+
+  it("renders a retryable model-timeout result without a low-risk claim", async () => {
+    vi.stubGlobal(
+      "fetch",
+      connectedFetch(auditResponse("failed", "MODEL_TIMEOUT")),
+    );
+    const user = userEvent.setup();
+    renderShell("A careful claim.");
+
+    await screen.findByText("Local services ready");
+    await user.click(screen.getByRole("button", { name: "Audit text" }));
+
+    expect(await screen.findByText("The local model timed out")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry audit" })).toBeEnabled();
   });
 });

@@ -152,11 +152,20 @@ class OllamaInstructionModel:
         invalid_output: str,
         error: ValidationError | ValueError,
     ) -> str:
-        error_name = type(error).__name__
+        if isinstance(error, ValidationError):
+            messages = [
+                str(item.get("msg", "Validation failed."))
+                for item in error.errors(include_input=False, include_url=False)
+            ]
+            feedback = "; ".join(dict.fromkeys(messages))[:1_000]
+        else:
+            feedback = type(error).__name__
         bounded_output = invalid_output[:12_000]
         return (
             f"{request.system_prompt.strip()}\n\n"
-            f"The prior JSON failed {error_name}. Correct it once. Preserve only facts "
+            f"The prior JSON failed validation: {feedback}. Correct it once. "
+            "Remove optional spans when their offsets are uncertain and remove "
+            "duplicates. Preserve only facts "
             "and offsets from the original request. Return JSON only.\n"
             f"<invalid-json>\n{bounded_output}\n</invalid-json>\n\n"
             f"<audit-input>\n{request.user_prompt}\n</audit-input>"
