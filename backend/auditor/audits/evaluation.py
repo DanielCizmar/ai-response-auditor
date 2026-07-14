@@ -7,6 +7,24 @@ from backend.auditor.domain.audits import AuditLanguage
 
 
 @dataclass(frozen=True)
+class LabeledFinding:
+    language: AuditLanguage
+    case_id: str
+    finding_type: str
+
+
+@dataclass(frozen=True)
+class LanguagePrecision:
+    language: AuditLanguage
+    matched: int
+    predicted: int
+
+    @property
+    def precision(self) -> float:
+        return 1.0 if self.predicted == 0 else self.matched / self.predicted
+
+
+@dataclass(frozen=True)
 class LabeledClaimSpan:
     language: AuditLanguage
     case_id: str
@@ -45,6 +63,26 @@ def claim_recall_by_language(
             language=language,
             matched=len(expected_sets[language] & predicted_sets[language]),
             expected=len(expected_sets[language]),
+        )
+        for language in AuditLanguage
+    }
+
+
+def finding_precision_by_language(
+    expected: tuple[LabeledFinding, ...],
+    predicted: tuple[LabeledFinding, ...],
+) -> dict[AuditLanguage, LanguagePrecision]:
+    expected_sets: dict[AuditLanguage, set[tuple[str, str]]] = defaultdict(set)
+    predicted_sets: dict[AuditLanguage, set[tuple[str, str]]] = defaultdict(set)
+    for finding in expected:
+        expected_sets[finding.language].add((finding.case_id, finding.finding_type))
+    for finding in predicted:
+        predicted_sets[finding.language].add((finding.case_id, finding.finding_type))
+    return {
+        language: LanguagePrecision(
+            language=language,
+            matched=len(expected_sets[language] & predicted_sets[language]),
+            predicted=len(predicted_sets[language]),
         )
         for language in AuditLanguage
     }

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "en-percentage-conflict",
+    "language": "en",
+    "claims": ["Retention was 20%.", "Retention was 30%."],
+    "expected_kind": "percentage",
+    "expected_findings": 2
+  },
+  {
+    "id": "sk-sample-conflict",
+    "language": "sk",
+    "claims": ["Vzorku tvorilo 40 účastníkov.", "Vzorku tvorilo 45 účastníkov."],
+    "expected_kind": "sample_size",
+    "expected_findings": 2
+  }
+]
+

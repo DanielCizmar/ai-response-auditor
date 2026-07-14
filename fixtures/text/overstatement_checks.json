@@ -1,0 +1,15 @@
+[
+  {
+    "id": "en-causal",
+    "language": "en",
+    "claim": "The program guarantees better retention.",
+    "finding_type": "certainty_overstatement"
+  },
+  {
+    "id": "sk-scope",
+    "language": "sk",
+    "claim": "Výsledok platí pre všetkých.",
+    "finding_type": "scope_ambiguity"
+  }
+]
+
