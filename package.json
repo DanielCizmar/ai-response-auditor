@@ -11,6 +11,8 @@
     "build:web": "corepack pnpm --filter @auditor/web build",
     "api:dev": "uv run uvicorn apps.api.main:app --reload",
     "check": "corepack pnpm run test",
+    "db:check": "uv run python -m alembic check",
+    "db:migrate": "uv run python -m alembic upgrade head",
     "dev:web": "corepack pnpm --filter @auditor/web dev",
     "format:python:check": "uv run ruff format --check apps backend scripts",
     "infra:down": "docker compose down",

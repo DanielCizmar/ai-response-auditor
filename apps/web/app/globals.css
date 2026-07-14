@@ -29,6 +29,30 @@ a {
   background: rgb(46 96 115 / 0.2);
 }
 
+.auditor-editor p,
+.auditor-editor ul,
+.auditor-editor ol {
+  margin: 0 0 0.85rem;
+}
+
+.auditor-editor ul,
+.auditor-editor ol {
+  padding-left: 1.4rem;
+}
+
+.auditor-editor p.is-editor-empty:first-child::before {
+  height: 0;
+  color: var(--evidence-needed);
+  content: attr(data-placeholder);
+  float: left;
+  pointer-events: none;
+}
+
+.auditor-editor:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0.5rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
