@@ -5,31 +5,33 @@ import { useQuery } from "@tanstack/react-query";
 import { Check, CircleAlert, LoaderCircle, RotateCw } from "lucide-react";
 
 import { fetchReadiness } from "@/lib/readiness";
+import { useLocale } from "@/lib/locale";
 
 const states = {
   checking: {
-    title: "Checking local services",
-    detail: "Looking for the API and configured local models.",
+    title: "readiness.checking.title",
+    detail: "readiness.checking.detail",
     className: "border-evidence-needed/35 bg-evidence-needed/5",
   },
   ready: {
-    title: "Local services ready",
-    detail: "The private local workspace can accept an audit.",
+    title: "readiness.ready.title",
+    detail: "readiness.ready.detail",
     className: "border-supported/35 bg-supported/5",
   },
   setup: {
-    title: "Local setup needs attention",
-    detail: "The API is connected, but one or more required services are not ready.",
+    title: "readiness.setup.title",
+    detail: "readiness.setup.detail",
     className: "border-warning/40 bg-warning/6",
   },
   disconnected: {
-    title: "Local API is disconnected",
-    detail: "Start the local API, then retry the connection. Your text stays in this browser.",
+    title: "readiness.disconnected.title",
+    detail: "readiness.disconnected.detail",
     className: "border-high-risk/35 bg-high-risk/5",
   },
 } as const;
 
 export function ServiceReadiness() {
+  const { t } = useLocale();
   const query = useQuery({ queryKey: ["readiness"], queryFn: fetchReadiness });
   const state = query.isPending
     ? "checking"
@@ -58,8 +60,8 @@ export function ServiceReadiness() {
           className={cn("mt-0.5 size-4 shrink-0", state === "checking" && "animate-spin")}
         />
         <div>
-          <p className="text-sm font-semibold text-ink">{copy.title}</p>
-          <p className="mt-0.5 text-sm leading-5 text-evidence-needed">{copy.detail}</p>
+          <p className="text-sm font-semibold text-ink">{t(copy.title)}</p>
+          <p className="mt-0.5 text-sm leading-5 text-evidence-needed">{t(copy.detail)}</p>
         </div>
       </div>
       {(state === "disconnected" || state === "setup") && (
@@ -71,7 +73,7 @@ export function ServiceReadiness() {
           )}
           <Button variant="outline" size="sm" onClick={() => query.refetch()}>
             <RotateCw aria-hidden="true" className="size-3.5" />
-            Retry connection
+            {t("readiness.retry")}
           </Button>
         </div>
       )}

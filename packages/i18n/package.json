@@ -2,5 +2,14 @@
   "name": "@auditor/i18n",
   "version": "0.0.0",
   "private": true,
-  "description": "English and Slovak localization boundary; catalogs begin in M1.1."
+  "description": "Reviewed English and Slovak message catalogs for the auditor.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./en": "./src/en.json",
+    "./sk": "./src/sk.json"
+  },
+  "files": [
+    "src"
+  ]
 }

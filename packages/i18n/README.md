@@ -1,3 +1,5 @@
 # Internationalization
 
-This workspace is reserved for English and Slovak message catalogs. Catalog implementation belongs to MVP1 milestone M1.1.
+Reviewed English and Slovak catalogs live in `src/en.json` and `src/sk.json`.
+Application state persists language-independent keys and enums; interface copy is
+resolved at render time. The browser preference key is `auditor.interface-locale`.

@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     app_environment: str = "development"
     app_log_level: str = "INFO"
     database_url: SecretStr = SecretStr(
-        "postgresql+psycopg://auditor:auditor_local_dev@localhost:5432/auditor"
+        "postgresql+psycopg://auditor:auditor_local_dev@127.0.0.1:5432/auditor"
     )
     redis_url: SecretStr = SecretStr("redis://localhost:6379/0")
     ollama_base_url: str = "http://127.0.0.1:11435"

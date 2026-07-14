@@ -13,7 +13,10 @@ Next.js, FastAPI, PostgreSQL with pgvector, Redis, Celery, Ollama, and Docker Co
 
 ## Status
 
-The project is currently in the planning and foundation stage. See [docs/PLAN.md](docs/PLAN.md) for the implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
+Foundation and MVP1 milestones M1.1–M1.3 are available: bilingual interface
+catalogs, immutable audit schema, and the local pasted-text editor. Audit pipeline
+execution begins in later MVP1 milestones. See [docs/PLAN.md](docs/PLAN.md) for the
+implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
 
 ## Development
 
@@ -58,6 +61,10 @@ API produces a concrete setup and retry state rather than a simulated audit.
 The API foundation is available; the frontend and worker runtimes are introduced by
 their later milestones.
 
+The editor accepts English or Slovak text, preserves a canonical plain-text copy,
+and enforces the 10,000 Unicode-character MVP1 limit. The audit action remains
+unavailable until the audit API and pipeline milestones are implemented.
+
 ### FastAPI
 
 Start PostgreSQL, Redis, and Ollama, then run the local API:
@@ -89,6 +96,13 @@ corepack pnpm infra:down
 ```
 
 Deleting the named volumes is intentionally not exposed as a package script because it destroys local data.
+
+Apply or verify the audit schema after PostgreSQL is healthy:
+
+```powershell
+corepack pnpm db:migrate
+corepack pnpm db:check
+```
 
 ### Local Ollama
 

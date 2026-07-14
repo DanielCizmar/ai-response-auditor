@@ -147,17 +147,14 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
       - name: Verify migration foundation
-        shell: bash
         run: |
-          if [[ -f alembic.ini && -d migrations ]]; then
-            uv sync --frozen --all-groups
-            uv run alembic upgrade head
-          elif [[ -e alembic.ini || -e migrations ]]; then
-            echo "Alembic is only partially configured." >&2
-            exit 1
-          else
-            echo "Alembic is not configured yet; schema migrations begin in M1.2."
-          fi
+          uv sync --frozen --all-groups
+          uv run python -m alembic upgrade head
+          uv run python -m alembic current --check-heads
+          uv run python -m alembic check
+          uv run pytest backend/tests/test_audit_persistence.py
+          uv run python -m alembic downgrade base
+          uv run python -m alembic upgrade head
 
   infrastructure-smoke:
     name: Infrastructure smoke
