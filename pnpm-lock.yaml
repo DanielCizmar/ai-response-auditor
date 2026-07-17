@@ -31,9 +31,15 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.101.2
         version: 5.101.2(react@19.2.7)
+      '@tiptap/core':
+        specifier: ^3.20.1
+        version: 3.27.4(@tiptap/pm@3.27.4)
       '@tiptap/extension-placeholder':
         specifier: ^3.20.1
         version: 3.27.4(@tiptap/extensions@3.27.4(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))(@tiptap/pm@3.27.4))
+      '@tiptap/pm':
+        specifier: ^3.20.1
+        version: 3.27.4
       '@tiptap/react':
         specifier: ^3.20.1
         version: 3.27.4(@floating-ui/dom@1.8.0)(@tiptap/core@3.27.4(@tiptap/pm@3.27.4))(@tiptap/pm@3.27.4)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

@@ -283,10 +283,19 @@ def test_create_get_and_reaudit_preserve_idempotency_and_lineage() -> None:
     rerun = api.post(
         f"/v1/audits/{audit_id}/re-audit",
         headers={"Idempotency-Key": "request-0002"},
+        json={"text": "A safer bounded claim.", "language": "en"},
     )
     assert rerun.status_code == 201
     assert rerun.json()["id"] != audit_id
     assert rerun.json()["re_audit_of_id"] == audit_id
+    assert rerun.json()["input_text"] == "A safer bounded claim."
+
+    unchanged_rerun = api.post(
+        f"/v1/audits/{audit_id}/re-audit",
+        headers={"Idempotency-Key": "request-0003"},
+    )
+    assert unchanged_rerun.status_code == 201
+    assert unchanged_rerun.json()["input_text"] == "A bounded claim."
 
 
 def test_create_audit_rejects_reused_key_for_different_content() -> None:

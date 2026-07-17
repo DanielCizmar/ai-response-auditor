@@ -479,7 +479,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CreateAuditRequest"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             201: {
