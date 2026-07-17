@@ -13,7 +13,9 @@ text uses LF for block boundaries and hard breaks, preserves entered Unicode cod
 points without normalization, and is limited to 10,000 Unicode characters. UI
 language and audited-text language are independent choices.
 
-M1.12 submits immutable audit copies through TanStack Query when readiness is green.
-The workbench distinguishes pending, timeout, retry, partial, failed, missing-model,
-and disconnected states. Claim highlighting and claim-level inspection remain in
-M1.13 and M1.14.
+M1.12–M1.15 submit immutable audit copies through TanStack Query, render persisted
+claim spans as accessible derived TipTap decorations, and connect each selection to
+its findings, score components, explanation, and validated revision. Overlapping
+claims expose a chooser; edits visibly stale the prior review. Suggestions are
+applied only when the complete audited text and exact Unicode span still match, and
+re-auditing edited text creates a new run linked to the prior immutable audit.

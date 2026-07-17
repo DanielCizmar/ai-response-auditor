@@ -97,6 +97,7 @@ def build_audit_router(
         audit_id: UUID,
         response: Response,
         idempotency_key: IdempotencyKey,
+        request: CreateAuditRequest | None = None,
     ) -> AuditResult:
         _require_ready(readiness_service)
         try:
@@ -107,8 +108,12 @@ def build_audit_router(
             ) from error
         result, replayed = _create(
             audit_service,
-            original.input_text,
-            AuditLanguage(original.language),
+            request.text if request is not None else original.input_text,
+            (
+                request.language
+                if request is not None
+                else AuditLanguage(original.language)
+            ),
             idempotency_key,
             re_audit_of_id=audit_id,
         )

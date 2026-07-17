@@ -70,3 +70,36 @@ export async function getAudit(
   }
   return (await response.json()) as Audit;
 }
+
+export async function reAudit(
+  baseUrl: string,
+  auditId: string,
+  request: { text: string; language: AuditLanguage; idempotencyKey: string },
+  signal?: AbortSignal,
+): Promise<Audit> {
+  const response = await fetch(`${baseUrl}/v1/audits/${auditId}/re-audit`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Idempotency-Key": request.idempotencyKey,
+    },
+    body: JSON.stringify({ text: request.text, language: request.language }),
+    signal,
+  });
+  if (!response.ok) {
+    let envelope: Partial<ErrorEnvelope> = {};
+    try {
+      envelope = (await response.json()) as ErrorEnvelope;
+    } catch {
+      // The public error below remains content-free when a proxy returns non-JSON.
+    }
+    throw new ApiClientError(
+      envelope.error?.message ?? "The local re-audit request failed.",
+      response.status,
+      envelope.error?.code ?? "REQUEST_FAILED",
+      envelope.error?.details,
+    );
+  }
+  return (await response.json()) as Audit;
+}

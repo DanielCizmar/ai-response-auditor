@@ -1,5 +1,6 @@
 import {
   createAudit as createAuditRequest,
+  reAudit as reAuditRequest,
   type Audit,
   type AuditLanguage,
 } from "@auditor/api-client";
@@ -17,11 +18,19 @@ export async function runAudit(input: {
   text: string;
   language: AuditLanguage;
   idempotencyKey: string;
+  sourceAuditId?: string;
 }): Promise<Audit> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 190_000);
   try {
-    return await createAuditRequest(API_BASE_URL, input, controller.signal);
+    return input.sourceAuditId
+      ? await reAuditRequest(
+          API_BASE_URL,
+          input.sourceAuditId,
+          input,
+          controller.signal,
+        )
+      : await createAuditRequest(API_BASE_URL, input, controller.signal);
   } catch (error) {
     if (controller.signal.aborted) {
       throw new AuditRequestTimeout();

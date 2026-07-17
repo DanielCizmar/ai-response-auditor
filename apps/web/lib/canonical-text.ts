@@ -41,3 +41,13 @@ export function sliceByCodePointOffsets(
 export function codePointOffsetToUtf16Index(text: string, offset: number): number {
   return sliceByCodePointOffsets(text, 0, offset).length;
 }
+
+export function canonicalTextToDocument(text: string) {
+  return {
+    type: "doc",
+    content: text.split("\n").map((line) => ({
+      type: "paragraph",
+      ...(line ? { content: [{ type: "text", text: line }] } : {}),
+    })),
+  };
+}

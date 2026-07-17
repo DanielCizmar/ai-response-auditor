@@ -13,11 +13,13 @@ Next.js, FastAPI, PostgreSQL with pgvector, Redis, Celery, Ollama, and Docker Co
 
 ## Status
 
-Foundation and MVP1 milestones M1.1–M1.12 are available: the bilingual editor,
+Foundation and MVP1 milestones M1.1–M1.15 are available: the bilingual editor,
 immutable audit persistence, explicit deterministic and model-assisted pipeline stages,
 versioned risk scoring and revisions, a working audit API, and browser execution states.
-Claim highlighting and inspection begin in the next milestones. See [docs/PLAN.md](docs/PLAN.md)
-for the implementation plan and [AGENTS.md](AGENTS.md) for repository guidelines.
+The workbench now includes accessible claim highlighting, overlap selection, a
+responsive claim inspector, exact-span suggestion application, and immutable re-audit
+lineage. See [docs/PLAN.md](docs/PLAN.md) for the implementation plan and
+[AGENTS.md](AGENTS.md) for repository guidelines.
 
 ## Development
 

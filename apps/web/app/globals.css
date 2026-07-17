@@ -53,6 +53,57 @@ a {
   outline-offset: 0.5rem;
 }
 
+.claim-mark {
+  border-radius: 0.12rem;
+  cursor: pointer;
+  text-decoration-line: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.18em;
+  transition:
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.claim-mark--low_risk {
+  text-decoration-color: var(--supported);
+  text-decoration-style: solid;
+}
+
+.claim-mark--review_recommended {
+  text-decoration-color: var(--warning);
+  text-decoration-style: dotted;
+}
+
+.claim-mark--evidence_needed,
+.claim-mark--not_verifiable {
+  text-decoration-color: var(--evidence-needed);
+  text-decoration-style: dashed;
+}
+
+.claim-mark--internally_inconsistent,
+.claim-mark--overstated {
+  text-decoration-color: var(--high-risk);
+  text-decoration-style: double;
+}
+
+.claim-mark--active {
+  background: rgb(46 96 115 / 0.12);
+  box-shadow: inset 0.18rem 0 var(--mineral);
+}
+
+.claim-mark--stale {
+  background: rgb(104 119 125 / 0.08);
+  color: var(--evidence-needed);
+  text-decoration-color: var(--evidence-needed);
+}
+
+.claim-mark:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0.16rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
